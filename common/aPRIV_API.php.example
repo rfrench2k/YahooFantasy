@@ -1,0 +1,59 @@
+<?php
+// Copy this file to aPRIV_API.php and fill in your own Yahoo API credentials.
+// Register an app at https://developer.yahoo.com/apps/ to obtain a client ID/secret.
+
+// Yahoo Fantasy Sports API
+define('YAHOO_CLIENT_ID', 'your_yahoo_client_id');
+define('YAHOO_CLIENT_SECRET', 'your_yahoo_client_secret');
+define('YAHOO_REDIRECT_URI', 'https://yourdomain.com/fantasy/auth/callback.php');
+
+// NOTE: Claude AI integration uses the centralized AI system (aiCentral).
+// API keys are managed there - see the /ai/ companion repo for configuration.
+// Direct API calls are FORBIDDEN - use ai_makeRequest() instead.
+
+// Yahoo Fantasy API URLs
+define('YAHOO_BASE_URL', 'https://fantasysports.yahooapis.com/fantasy/v2');
+define('YAHOO_AUTH_URL', 'https://api.login.yahoo.com/oauth2/request_auth');
+define('YAHOO_TOKEN_URL', 'https://api.login.yahoo.com/oauth2/get_token');
+
+// API Rate Limits
+define('YAHOO_RATE_LIMIT', 5000); // requests per hour
+define('CLAUDE_RATE_LIMIT', 60); // requests per minute
+
+// Analysis Settings
+define('ANALYSIS_CACHE_DURATION', 3600); // 1 hour in seconds
+define('PLAYER_DATA_REFRESH_INTERVAL', 15 * 60); // 15 minutes in seconds
+
+// Fantasy Analysis Configuration
+function getYahooHeaders($access_token) {
+    return [
+        'Authorization: Bearer ' . $access_token,
+        'Accept: application/json',
+        'User-Agent: FantasyFootballAI/1.0'
+    ];
+}
+
+// DEPRECATED: getClaudeHeaders() - No longer used
+// AI requests now go through centralized AI system via ai_makeRequest()
+
+function enforceYahooRateLimit() {
+    static $lastRequest = 0;
+    $now = microtime(true);
+    $timeSinceLastRequest = ($now - $lastRequest) * 1000; // Convert to ms
+
+    $requiredDelay = 3600000 / YAHOO_RATE_LIMIT; // ms per request
+
+    if ($timeSinceLastRequest < $requiredDelay) {
+        $sleepTime = ($requiredDelay - $timeSinceLastRequest) / 1000; // Convert back to seconds
+        usleep($sleepTime * 1000000); // usleep takes microseconds
+    }
+
+    $lastRequest = microtime(true);
+}
+
+function enforceClaudeRateLimit() {
+    // NOTE: Rate limiting is now handled by AI Central tier system
+    // This function kept for backwards compatibility but does nothing
+    // Tier-based limits are enforced in ai_makeRequest()
+    return;
+}

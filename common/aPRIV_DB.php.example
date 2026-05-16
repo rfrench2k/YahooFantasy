@@ -1,0 +1,72 @@
+<?php
+// Copy this file to aPRIV_DB.php and fill in your own database credentials.
+$servername = "localhost";
+$username = "your_db_user";
+$password = "your_db_password";
+$dbname = "fantasy";
+
+function getDBConnection() {
+    global $servername, $username, $password, $dbname;
+
+    try {
+        $conn = new mysqli($servername, $username, $password, $dbname);
+
+        if ($conn->connect_error) {
+            logMessage("Database connection failed: " . $conn->connect_error);
+            return false;
+        }
+
+        return $conn;
+    } catch (Exception $e) {
+        logMessage("Exception occurred while connecting to the database: " . $e->getMessage());
+        return false;
+    }
+}
+
+function closeDBConnection($conn) {
+    if ($conn) {
+        $conn->close();
+    }
+}
+
+// Helper function to execute parameterized queries
+function executeQuery($sql, $params = [], $types = '') {
+    $conn = getDBConnection();
+    if (!$conn) {
+        logMessage("Failed to establish database connection in executeQuery");
+        return false;
+    }
+
+    try {
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Failed to prepare statement: " . $conn->error);
+        }
+
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $result = $stmt->execute();
+        if (!$result) {
+            throw new Exception("Failed to execute statement: " . $stmt->error);
+        }
+
+        $resultData = $stmt->get_result();
+        $data = [];
+
+        if ($resultData) {
+            while ($row = $resultData->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+
+        $stmt->close();
+        return ['success' => true, 'data' => $data, 'insert_id' => $conn->insert_id];
+    } catch (Exception $e) {
+        logMessage("Error in executeQuery: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    } finally {
+        closeDBConnection($conn);
+    }
+}

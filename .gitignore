@@ -1,0 +1,16 @@
+# Secrets — never commit. Copy the .example files and fill in your own values.
+common/aPRIV_DB.php
+common/aPRIV_API.php
+common/aPRIV_DB_production.php
+
+# Local-only docs — README.md is the only doc that ships.
+docs/
+*.md
+!README.md
+*.txt
+
+# Logs
+*.log
+
+# Editor / tooling
+.claude/
