@@ -6,7 +6,7 @@ include_once '../common/aPRIV_API.php';
 // Get authenticated user from centralized AUTH system
 $authUserId = getCurrentUserId();
 if (!$authUserId) {
-    header('Location: /auth/login.php');
+    header('Location: /auth/login.php?program=FANTASY&redirect=' . urlencode($_SERVER['REQUEST_URI']));
     exit;
 }
 
