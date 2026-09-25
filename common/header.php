@@ -157,14 +157,17 @@ if (!$yahooLinked && !$isYahooLinkPage) {
                     <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($userName); ?>
                 </span>
                 <?php if ($yahooLinked): ?>
-                <a href="/fantasy/auth/logout.php" class="btn btn-outline-light">
-                    <i class="fas fa-sign-out-alt"></i> Yahoo Logout
+                <a href="/fantasy/auth/logout.php" class="btn btn-outline-light me-2">
+                    <i class="fas fa-unlink"></i> Disconnect Yahoo
                 </a>
                 <?php else: ?>
-                <a href="/fantasy/auth/yahoo_auth.php" class="btn btn-outline-light">
+                <a href="/fantasy/auth/yahoo_auth.php" class="btn btn-outline-light me-2">
                     <i class="fas fa-sign-in-alt"></i> Yahoo Login
                 </a>
                 <?php endif; ?>
+                <a href="/auth/logout.php?program=FANTASY" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
         </div>
     </div>
