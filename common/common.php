@@ -30,7 +30,7 @@ ini_set('log_errors', 1);
 
 // Application Settings
 define('APP_ROOT', __DIR__);
-define('LOG_FILE_PATH', APP_ROOT . '/fantasy.log');
+define('LOG_FILE_PATH', 'D:/AdvancedVentures/logs/fantasy/fantasy.log');
 
 // Get authenticated user from centralized AUTH system
 // This runs for all requests EXCEPT CLI scripts

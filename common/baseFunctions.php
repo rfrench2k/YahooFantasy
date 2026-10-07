@@ -16,7 +16,7 @@
  * @return void
  */
 function logMessage($message, $level = 'INFO') {
-    $logFile = $_SERVER['DOCUMENT_ROOT'] . '/fantasy/common/fantasy.log';
+    $logFile = 'D:/AdvancedVentures/logs/fantasy/fantasy.log';
     $timestamp = date('Y-m-d H:i:s');
     $logEntry = "[$timestamp] [$level] $message\n";
     file_put_contents($logFile, $logEntry, FILE_APPEND);
