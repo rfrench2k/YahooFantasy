@@ -4,7 +4,6 @@ include_once __DIR__ . '/common.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/ai/includes/ai_functions.php';
 
 class ClaudeAPI {
-    private $model = 'claude-sonnet-4-20250514';
 
     public function analyzeTeam($userId, $rosterData, $availablePlayers, $leagueSettings, $focusArea = '') {
         enforceClaudeRateLimit();
