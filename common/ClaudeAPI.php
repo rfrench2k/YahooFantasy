@@ -19,7 +19,8 @@ class ClaudeAPI {
             'options' => [
                 'max_tokens' => 4000,
                 'temperature' => 0.7,
-                'system' => 'You are an expert fantasy football analyst with access to web search for current NFL data and player information.'
+                'system' => 'You are an expert fantasy football analyst with access to web search for current NFL data and player information.',
+                'json_schema' => $this->teamAnalysisSchema()
             ]
         ]);
 
@@ -132,6 +133,31 @@ class ClaudeAPI {
         $prompt .= "- Am I using $currentSeason data only?\n";
 
         return $prompt;
+    }
+
+    // JSON Schema of the team analysis answer (the JSON format at the end of buildAnalysisPrompt)
+    private function teamAnalysisSchema() {
+        $str = ['type' => 'string'];
+        return [
+            'type' => 'object',
+            'properties' => [
+                'add_recommendations' => $this->objectListSchema(['player_name', 'player_key', 'position', 'team', 'reasoning', 'priority'], ['priority' => ['High', 'Medium', 'Low']]),
+                'drop_candidates' => $this->objectListSchema(['player_name', 'player_key', 'position', 'reasoning']),
+                'roster_optimizations' => ['type' => 'array', 'items' => $str],
+                'general_analysis' => $str
+            ],
+            'required' => ['add_recommendations', 'drop_candidates', 'roster_optimizations', 'general_analysis'],
+            'additionalProperties' => false
+        ];
+    }
+
+    // Schema of an array of objects whose listed keys are all required strings ($enums: key => allowed values)
+    private function objectListSchema($props, $enums = []) {
+        $p = [];
+        foreach ($props as $name) {
+            $p[$name] = isset($enums[$name]) ? ['type' => 'string', 'enum' => $enums[$name]] : ['type' => 'string'];
+        }
+        return ['type' => 'array', 'items' => ['type' => 'object', 'properties' => $p, 'required' => $props, 'additionalProperties' => false]];
     }
 
     private function parseAnalysisResponse($responseText) {
@@ -266,7 +292,8 @@ class ClaudeAPI {
             'options' => [
                 'max_tokens' => 3000,
                 'temperature' => 0.3,
-                'system' => 'You are an expert fantasy football lineup optimizer with access to web search for current NFL data.'
+                'system' => 'You are an expert fantasy football lineup optimizer with access to web search for current NFL data.',
+                'json_schema' => $this->optimizationSchema()
             ]
         ]);
 
@@ -349,6 +376,23 @@ class ClaudeAPI {
         $prompt .= "Focus on THIS WEEK's optimal lineup. Be specific about matchups and provide actionable recommendations.";
 
         return $prompt;
+    }
+
+    // JSON Schema of the lineup optimization answer (the JSON format at the end of buildOptimizationPrompt)
+    private function optimizationSchema() {
+        $str = ['type' => 'string'];
+        return [
+            'type' => 'object',
+            'properties' => [
+                'lineup_changes' => $this->objectListSchema(['action', 'player_name', 'position', 'reasoning', 'priority'], ['priority' => ['High', 'Medium', 'Low']]),
+                'start_sit_recommendations' => $this->objectListSchema(['action', 'player_name', 'position', 'reasoning', 'matchup_grade'], ['action' => ['start', 'sit']]),
+                'injury_concerns' => $this->objectListSchema(['player_name', 'status', 'recommendation']),
+                'weather_concerns' => ['type' => 'array', 'items' => $str],
+                'overall_strategy' => $str
+            ],
+            'required' => ['lineup_changes', 'start_sit_recommendations', 'injury_concerns', 'weather_concerns', 'overall_strategy'],
+            'additionalProperties' => false
+        ];
     }
 
     private function parseOptimizationResponse($responseText) {
